@@ -1,0 +1,3 @@
+fastapi==0.110.2
+uvicorn[standart]
+catboost==1.2.5
