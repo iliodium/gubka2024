@@ -1,0 +1,16 @@
+{"openapi":"3.1.0","info":{"title":"FastAPI","version":"0.1.0"},
+"paths":{"/api/v1/predictAtom":
+    {"post":
+        {
+            "summary":"Predict Atom"
+            ,"description":"{\n    \"atom_info_list\":[\n      {\n          \"x\":1,\n          \"y\":1,\n          \"z\":1,\n          \"temperature\":1,\n          \"sticking_time\":1\n      }\n    ]\n}\n\n{\n    \"predicted_atoms\":[\n    {\n        \"x\":1,\n        \"y\":1,\n        \"z\":1\n    }\n    ]\n}"
+            ,"operationId":"predict_atom_api_v1_predictAtom_post"
+            ,"requestBody":{"content":{"application/json":{"schema":{"type":"object","title":"Atoms"}}},
+            "required":true},
+            "responses":{"200":{"description":"Successful Response",
+            "content":{"application/json":{"schema":{}}}},
+            "422":{"description":"Validation Error",
+            "content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}}},
+"/api/healthCheck":
+    {"get":
+        {"summary":"Health Check","operationId":"health_check_api_healthCheck_get","responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{}}}}}}}},"components":{"schemas":{"HTTPValidationError":{"properties":{"detail":{"items":{"$ref":"#/components/schemas/ValidationError"},"type":"array","title":"Detail"}},"type":"object","title":"HTTPValidationError"},"ValidationError":{"properties":{"loc":{"items":{"anyOf":[{"type":"string"},{"type":"integer"}]},"type":"array","title":"Location"},"msg":{"type":"string","title":"Message"},"type":{"type":"string","title":"Error Type"}},"type":"object","required":["loc","msg","type"],"title":"ValidationError"}}}}
