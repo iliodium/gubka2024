@@ -2,6 +2,7 @@
 import * as THREE from 'three';
 import Stats from 'three/addons/libs/stats.module.js'
 import Link from "next/link"
+import { Axios } from 'axios';
 import {
     GUI
 } from 'three/addons/libs/lil-gui.module.min.js';
@@ -65,7 +66,7 @@ function sleep(milliseconds) {
 }
 
 export default function CubeScene () {
-
+    const axios = require('axios').default
     const sceneRef = useRef(null);
     const [loading, setLoading] = useState(true)
     const [loading2, setLoading2] = useState(true)
@@ -80,7 +81,7 @@ export default function CubeScene () {
     const dotsSecondVariant = []
 
     useEffect(() => {
-        if (!loading) {
+        if (!loading && type) {
         const newDots = [];
         let container;
         let camera, scene, renderer;
@@ -232,19 +233,15 @@ export default function CubeScene () {
                     sticking_time: item.sticking_time
                 }));
                 console.log({ atom_info_list, model: type })
-                const response = await fetch('http://127.0.0.1:8080/api/v1/predictAtom', {
-                    method: "POST",
-                    credentials: "same-origin",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({ atom_info_list, model: type })
+                const response = await axios.post('http://127.0.0.1:8080/api/v1/predictAtom', {
+                    atom_info_list, 
+                    model: type 
                 })
-                if (!response.ok) {
+                if (!response.status) {
                     throw new Error('Ошибка HTTP: ' + response.status);
                 }
         
-                const { predicted_atoms } = await response.json();
+                const { predicted_atoms } = response.data;
                 const time = 100
                 const dataToResponse = newDots.map((item, index) => ({
                     x1: item.x1,
@@ -275,7 +272,7 @@ export default function CubeScene () {
                 newDots.map((dot) => {
                     scene.add(dot.sphereMesh);
                 })
-                renderer()
+                // renderer()
 
             }
             catch(e){
@@ -403,9 +400,7 @@ export default function CubeScene () {
             render();
 
         }
-        return () => {
-            sceneRef.current.removeChild(renderer.domElement);
-        };}
+    }
     }, [loading])
     return <div>
         {loading ? null : (< div ref = {

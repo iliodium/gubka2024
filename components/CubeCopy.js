@@ -1,7 +1,7 @@
 'use client'
 import * as THREE from 'three';
 import Stats from 'three/addons/libs/stats.module.js'
-
+import { Axios } from 'axios';
 import {
     GUI
 } from 'three/addons/libs/lil-gui.module.min.js';
@@ -67,6 +67,7 @@ export default function CubeCopy () {
 
     const sceneRef = useRef(null);
     const dotsSecondVariant = []
+    const axios = require('axios').default
 
     useEffect(() => {
         const newDots = [];
@@ -175,7 +176,6 @@ export default function CubeCopy () {
                 gui.add( params, 'countDots', 1, 10 ).step( 1 ).onChange( function ( value ) {
 
 					countDots = value;
-                    console.log(value)
 					initDots(value);
 					render();
 
@@ -199,10 +199,8 @@ export default function CubeCopy () {
                 guiRenderOneDot.add( paramsOneDot, 'temperature').onChange( render )
                 guiRenderOneDot.add(paramsOneDot, 'arRought').onChange(render);
                 guiRenderOneDot.add(paramsOneDot, 'arSmooth').onChange(function(value) {
-                    console.log("hi");
                     paramsOneDot.arRought = false; // Set 'arRought' to false
                     paramsOneDot.heSmooth = false; // Set 'heSmooth' to false
-                    console.log(paramsOneDot.arRought);
                     render(); // Call the render function
                 });
                 
@@ -239,7 +237,6 @@ export default function CubeCopy () {
                 geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(ARC_SEGMENTS * 3), 3));
 
                 initDots(1)
-                console.log(newDots)
                 function initDots (countDots){
                     // console.log(countDots)
                     newDots.length = 0
@@ -261,19 +258,15 @@ export default function CubeCopy () {
                     atom_info_list:atom_info_list,
                     model: "model He rough"
                 }
-                const response = await fetch('http://127.0.0.1:8080/api/v1/predictAtom', {
-                    method: "POST",
-                    credentials: "same-origin",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({ "atom_info_list": atom_info_list, "model": "model He rough"})
+                const response = await axios.post('http://127.0.0.1:8080/api/v1/predictAtom', {
+                    "atom_info_list": atom_info_list,
+                    "model": "model He rough"
                 })
-                if (!response.ok) {
+                if (!response.status) {
                     throw new Error('Ошибка HTTP: ' + response.status);
                 }
         
-                const { predicted_atoms } = await response.json();
+                const { predicted_atoms } = response.data;
                 const time = 100
                 const dataToResponse = newDots.map((item, index) => ({
                     x1: item.x1,
@@ -431,9 +424,6 @@ export default function CubeCopy () {
             render();
 
         }
-        return () => {
-            sceneRef.current.removeChild(renderer.domElement);
-        };
     }, [])
     return < div ref = {
         sceneRef
